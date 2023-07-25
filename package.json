@@ -46,14 +46,14 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/devesh-g-simformsolutions/react-native-multiplier.git"
+    "url": "git+https://github.com/biladen796/dx-webview-v1"
   },
-  "author": "GMO <dev@runsystem.net> (https://github.com/GmoDeveloper)",
+  "author": "GMO <dev@runsystem.net> (https://github.com/biladen796)",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/GmoDeveloper/webview-v1/issues"
+    "url": "https://github.com/biladen796/dx-webview-v1/issues"
   },
-  "homepage": "https://github.com/GmoDeveloper/webview-v1#readme",
+  "homepage": "https://github.com/biladen796/dx-webview-v1#readme",
   "publishConfig": {
     "registry": "https://registry.npmjs.org/"
   },
