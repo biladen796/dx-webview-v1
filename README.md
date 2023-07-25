@@ -5,17 +5,43 @@ Smaad webview
 ## Installation
 
 ```sh
-npm install webview-v1
+npm install react-native-webview webview-v1
 ```
-
+or
+```sh
+yarn add react-native-webview webview-v1
+```
 ## Usage
-
+In your App.js (or App.tsx)
 ```js
-import { multiply } from 'webview-v1';
+import { CustomWebviewPortal } from 'webview-v1';
 
 // ...
 
-const result = await multiply(3, 7);
+const App = () => {
+
+  // ...
+
+  return (
+    <SafeAreaProvider>
+      <SafeAreaView style={CommonStyles.container}>
+        <NativeBaseProvider>
+          <Provider store={store}>
+            <StatusBar
+              backgroundColor={'transparent'}
+              barStyle={'dark-content'}
+            />
+            <Navigation />
+            {/* Add Custom webview here */}
+            <CustomWebviewPortal />
+          </Provider>
+        </NativeBaseProvider>
+      </SafeAreaView>
+    </SafeAreaProvider>
+  )
+}
+
+export default App
 ```
 
 ## Contributing

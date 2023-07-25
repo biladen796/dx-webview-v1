@@ -1,18 +1,15 @@
 import * as React from 'react';
 
-import { StyleSheet, View, Text } from 'react-native';
-import { multiply } from 'webview-v1';
+import { Button, StyleSheet, View } from 'react-native';
+import { CustomWebviewPortal } from 'webview-v1';
 
 export default function App() {
-  const [result, setResult] = React.useState<number | undefined>();
-
-  React.useEffect(() => {
-    multiply(3, 7).then(setResult);
-  }, []);
-
   return (
     <View style={styles.container}>
-      <Text>Result: {result}</Text>
+      <Button title="Click" onPress={() => CustomWebviewPortal.show()}>
+        Click to open webview
+      </Button>
+      <CustomWebviewPortal uri="https://dev.fusion-wall2.smaad.net/wall/156348913/?u=reacttest" />
     </View>
   );
 }
