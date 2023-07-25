@@ -1,28 +1,52 @@
 import * as React from 'react';
+import { useState } from 'react';
+import { TextInput } from 'react-native';
+import { SafeAreaView } from 'react-native';
 
-import { Button, StyleSheet, View } from 'react-native';
+import { Button, StyleSheet } from 'react-native';
 import { CustomWebviewPortal } from 'webview-v1';
 
 export default function App() {
+  const [text, onChangeText] = useState(
+    'https://dev.fusion-wall.smaad.net/wall/156348913/?u=reacttest'
+  );
+
+  const handleSwitchToWebView = () => {
+    const domainSettings = [
+      'dev.fusion-wall.smaad.net',
+      'dev.fusion-wall2.smaad.net',
+      'offerwall.stg.smaad.net',
+      'offerwall.dev.smaad.net',
+      'wall.smaad.net',
+      'offerwall.smaad.net',
+    ];
+    CustomWebviewPortal.show(text, { whiteListDomain: domainSettings });
+    // WebViewNativeModule.presentNewScreen(domainSettings, text);
+  };
   return (
-    <View style={styles.container}>
-      <Button title="Click" onPress={() => CustomWebviewPortal.show()}>
-        Click to open webview
-      </Button>
-      <CustomWebviewPortal uri="https://dev.fusion-wall2.smaad.net/wall/156348913/?u=reacttest" />
-    </View>
+    <SafeAreaView style={styles.container}>
+      <TextInput
+        style={styles.input}
+        onChangeText={onChangeText}
+        value={text}
+      />
+
+      <Button title="Open" onPress={handleSwitchToWebView} />
+      <CustomWebviewPortal />
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: 'center',
     justifyContent: 'center',
+    padding: 16,
   },
-  box: {
-    width: 60,
-    height: 60,
-    marginVertical: 20,
+  input: {
+    height: 40,
+    margin: 12,
+    borderWidth: 1,
+    padding: 10,
   },
 });
