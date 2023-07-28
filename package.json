@@ -46,14 +46,14 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/biladen796/dx-webview-v1"
+    "url": "git+https://github.com/gmo-tech/smaad-wall-sdk/tree/main/smaad-offerwall"
   },
-  "author": "GMO <dev@runsystem.net> (https://github.com/biladen796)",
+  "author": "GMO <dev@runsystem.net> (https://github.com/gmo-tech/smaad-wall-sdk/tree/main/smaad-offerwall)",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/biladen796/dx-webview-v1/issues"
+    "url": "https://github.com/gmo-tech/smaad-wall-sdk/issues"
   },
-  "homepage": "https://github.com/biladen796/dx-webview-v1#readme",
+  "homepage": "https://github.com/gmo-tech/smaad-wall-sdk/tree/main/smaad-offerwall#readme",
   "publishConfig": {
     "registry": "https://registry.npmjs.org/"
   },

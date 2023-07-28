@@ -8,7 +8,7 @@ import { CustomWebviewPortal } from 'webview-v1';
 
 export default function App() {
   const [text, onChangeText] = useState(
-    'https://dev.fusion-wall.smaad.net/wall/156348913/?u=reacttest'
+    'https://dev.fusion-wall2.smaad.net/wall/156348913/?u=reacttest'
   );
 
   const handleSwitchToWebView = () => {

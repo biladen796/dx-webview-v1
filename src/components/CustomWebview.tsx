@@ -1,16 +1,21 @@
-import React, { memo, useRef, useState } from 'react';
+import React, {
+  createRef,
+  forwardRef,
+  memo,
+  useImperativeHandle,
+  useRef,
+} from 'react';
 import {
   Keyboard,
   StyleSheet,
-  View,
-  Text,
-  TextInput,
-  Button,
   Linking,
+  SafeAreaView,
+  Modal,
 } from 'react-native';
 import WebView from 'react-native-webview';
 import base64 from 'base-64';
 import url from 'url';
+import LoginForm from './LoginForm';
 
 type Props = {};
 
@@ -47,6 +52,7 @@ class CustomWebviewPortal extends React.Component<Props, State> {
   static modal: CustomWebviewPortal;
   showing = false;
   whitelistDomain: string[] = [];
+  customWebviewRef = createRef<any>();
   constructor(props: Props) {
     super(props);
     this.state = {
@@ -113,9 +119,11 @@ class CustomWebviewPortal extends React.Component<Props, State> {
       this.showing = false;
       this.setState({
         show: false,
-        showLoginForm: false,
-        uri: '',
         headers: undefined,
+        showLoginForm: false,
+        loginFormData: undefined,
+        uri: '',
+        isLogin: false,
       });
     }
   }
@@ -123,11 +131,11 @@ class CustomWebviewPortal extends React.Component<Props, State> {
   openLoginForm(urlFail: string) {
     this.setState({
       showLoginForm: true,
-      //   show: false,
-      uri: urlFail,
       show: false,
+      uri: urlFail,
       loginFormData: undefined,
     });
+    // this.customWebviewRef.current.stopLoad();
   }
 
   render() {
@@ -137,6 +145,7 @@ class CustomWebviewPortal extends React.Component<Props, State> {
         {show && (
           <CustomWebview
             uri={this.state.uri}
+            ref={this.customWebviewRef}
             headers={this.state.headers}
             onAuthError={this.openLoginForm.bind(this)}
             onCloseWebview={this.hide.bind(this)}
@@ -160,12 +169,16 @@ class CustomWebviewPortal extends React.Component<Props, State> {
                     loginFormData: undefined,
                   })
                 : Linking.openURL(newUrl);
+              // if (isWhiteList) {
+              //   Platform.OS === 'android' &&
+              //     this.customWebviewRef?.current?.reload();
+              // }
             }}
           />
         )}
         {showLoginForm && (
           <LoginForm
-            onCancel={() => {}}
+            onCancel={this.hide.bind(this)}
             onSubmit={({ name, pass }) => {
               this.setState({
                 headers: {
@@ -187,135 +200,128 @@ class CustomWebviewPortal extends React.Component<Props, State> {
 }
 
 const CustomWebview = memo(
-  ({
-    headers,
-    uri,
-    onAuthError,
-    onCloseWebview,
-    loginData,
-    onChangeHost,
-    onLoadEnd,
-  }: {
-    loginData?: { name: string; pass: string };
-    headers: any;
-    uri: string;
-    onAuthError: (failUrl: string) => void;
-    onCloseWebview: () => void;
-    onChangeHost: (newUrl: string) => void;
-    onLoadEnd: () => void;
-  }) => {
-    const ref = useRef<WebView>(null);
-    return (
-      <View style={[StyleSheet.absoluteFill, styles.container]}>
-        <WebView
-          ref={ref}
-          mediaPlaybackRequiresUserAction={false}
-          onShouldStartLoadWithRequest={(event) => {
-            console.log('onShouldStartLoadWithRequest', event);
-            const newUrlObj = url.parse(event.url);
-            const curUrlObj = url.parse(uri);
+  forwardRef(
+    (
+      {
+        headers,
+        uri,
+        onAuthError,
+        onCloseWebview,
+        loginData,
+        onChangeHost,
+        onLoadEnd,
+      }: {
+        loginData?: { name: string; pass: string };
+        headers: any;
+        uri: string;
+        onAuthError: (failUrl: string) => void;
+        onCloseWebview: () => void;
+        onChangeHost: (newUrl: string) => void;
+        onLoadEnd: () => void;
+      },
+      customWebviewRef
+    ) => {
+      const canGoBack = useRef(false);
+      const ref = useRef<WebView>(null);
+      useImperativeHandle(customWebviewRef, () => {
+        return {
+          reload: () => {
+            canGoBack.current = false;
+            ref.current?.clearHistory && ref.current?.clearHistory();
+            ref.current?.reload();
+          },
+          stopLoad: () => {
+            ref.current?.stopLoading();
+          },
+        };
+      });
+      return (
+        <Modal
+          visible={true}
+          animationType="none"
+          onRequestClose={() => {
+            console.log('onRequestClose web', canGoBack.current);
 
-            if (newUrlObj.host !== curUrlObj.host) {
-              onChangeHost(event.url);
-              return false;
-            }
-
-            return true;
-          }}
-          basicAuthCredential={
-            loginData
-              ? {
-                  username: loginData.name,
-                  password: loginData.pass,
-                }
-              : undefined
-          }
-          onLoadEnd={(e) => {
-            const newUrlObj = url.parse(e.nativeEvent.url);
-            const curUrlObj = url.parse(uri);
-            if (newUrlObj.host === curUrlObj.host && !e.nativeEvent.loading) {
-              onLoadEnd();
-            }
-          }}
-          javaScriptEnabled={true}
-          domStorageEnabled={true}
-          onMessage={(mess) => {
-            console.log('onMessage', mess.nativeEvent);
-
-            if (mess.nativeEvent.data === CLOSE_MESS_DATA) {
+            if (canGoBack.current) {
+              ref.current?.goBack();
+            } else {
               onCloseWebview();
             }
           }}
-          onHttpError={(event) => {
-            if (event.nativeEvent.statusCode === 401) {
-              onAuthError(event.nativeEvent.url);
-            }
-          }}
-          source={{ uri, headers }}
-          setSupportMultipleWindows={false}
-          containerStyle={styles.webviewContainer}
-        />
-      </View>
-    );
-  }
-);
+        >
+          <SafeAreaView style={[StyleSheet.absoluteFill, styles.container]}>
+            <WebView
+              ref={ref}
+              showsVerticalScrollIndicator={false}
+              mediaPlaybackRequiresUserAction={false}
+              allowsInlineMediaPlayback={true}
+              onShouldStartLoadWithRequest={(event) => {
+                console.log('onShouldStartLoadWithRequest', event);
+                const newUrlObj = url.parse(
+                  event.mainDocumentURL ? event.mainDocumentURL : event.url
+                );
+                const curUrlObj = url.parse(uri);
 
-const LoginForm = memo(
-  ({
-    onCancel,
-    onSubmit,
-  }: {
-    onCancel: () => void;
-    onSubmit: ({ name, pass }: { name: string; pass: string }) => void;
-  }) => {
-    const [name, setName] = useState('fusion');
-    const [pass, setPass] = useState('7Kv2Dt');
-    return (
-      <View
-        style={[
-          StyleSheet.absoluteFill,
-          styles.container,
-          { backgroundColor: 'rgba(0, 0, 0, 0.7)' },
-        ]}
-      >
-        <View style={styles.loginContainer}>
-          <View>
-            <Text style={{ fontSize: 20 }}>Authentication Required</Text>
-          </View>
-          <View>
-            <Text>Enter your login credentials</Text>
-          </View>
-          <View>
-            <TextInput
-              placeholder="Username"
-              value={name}
-              onChangeText={(text) => {
-                setName(text);
+                if (newUrlObj.host !== curUrlObj.host) {
+                  onChangeHost(event.url);
+                  canGoBack.current = false;
+                  ref.current?.clearHistory && ref.current?.clearHistory();
+                  return false;
+                }
+
+                return true;
               }}
-            />
-          </View>
-          <View>
-            <TextInput
-              placeholder="Password"
-              secureTextEntry={true}
-              value={pass}
-              onChangeText={(text) => {
-                setPass(text);
+              onNavigationStateChange={(state) => {
+                console.log('onNavigationStateChange', state);
+                if (!state.loading) {
+                  canGoBack.current = state.canGoBack;
+                }
               }}
+              basicAuthCredential={
+                loginData
+                  ? {
+                      username: loginData.name,
+                      password: loginData.pass,
+                    }
+                  : undefined
+              }
+              onLoadEnd={(e) => {
+                const newUrlObj = url.parse(e.nativeEvent.url);
+                const curUrlObj = url.parse(uri);
+                if (
+                  newUrlObj.host === curUrlObj.host &&
+                  !e.nativeEvent.loading
+                ) {
+                  onLoadEnd();
+                }
+              }}
+              javaScriptEnabled={true}
+              domStorageEnabled={true}
+              onMessage={(mess) => {
+                console.log('onMessage', mess.nativeEvent);
+
+                if (mess.nativeEvent.data === CLOSE_MESS_DATA) {
+                  onCloseWebview();
+                }
+              }}
+              onHttpError={(event) => {
+                console.log('onHttpError', event.nativeEvent);
+
+                if (event.nativeEvent.statusCode === 401) {
+                  onAuthError(event.nativeEvent.url);
+                  ref.current?.clearHistory && ref.current?.clearHistory();
+                  canGoBack.current = false;
+                }
+              }}
+              source={{ uri, headers }}
+              setSupportMultipleWindows={false}
+              containerStyle={styles.webviewContainer}
             />
-          </View>
-          <View style={styles.buttonContainer}>
-            <View>
-              <Button title="CANCEL" onPress={onCancel} />
-            </View>
-            <View style={{ marginLeft: 8 }}>
-              <Button title="OK" onPress={() => onSubmit({ name, pass })} />
-            </View>
-          </View>
-        </View>
-      </View>
-    );
-  }
+          </SafeAreaView>
+        </Modal>
+      );
+    }
+  )
 );
 
 export default CustomWebviewPortal;
@@ -324,6 +330,7 @@ const styles = StyleSheet.create({
   modal: {
     flex: 1,
   },
+  safeview: { position: 'absolute', width: '100%', height: '100%' },
   webviewContainer: { width: '100%', height: '100%' },
   buttonContainer: { flexDirection: 'row', justifyContent: 'flex-end' },
   container: {
@@ -331,14 +338,14 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     zIndex: 20,
-    elevation: 5,
+    elevation: 2,
   },
   loginContainer: {
     backgroundColor: 'white',
     padding: 24,
     width: '80%',
     zIndex: 20,
-    elevation: 5,
+    elevation: 2,
   },
   placeholder: {
     height: 120,

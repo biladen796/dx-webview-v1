@@ -1,20 +1,34 @@
-# webview-v1
+# smaad-offerwall
 
 Smaad webview
 
+## Publish to npm
+
+1. Login to npm
+```sh
+npm login
+```
+2. Pack your library
+```sh
+npm pack
+```
+3. Publish your library with the below command:
+```sh
+npm publish
+```
 ## Installation
 
 ```sh
-npm install react-native-webview webview-v1
+npm install react-native-webview smaad-offerwall
 ```
 or
 ```sh
-yarn add react-native-webview webview-v1
+yarn add react-native-webview smaad-offerwall
 ```
 ## Usage
 In your App.js (or App.tsx)
 ```js
-import { CustomWebviewPortal } from 'webview-v1';
+import { CustomWebviewPortal } from 'smaad-offerwall';
 
 // ...
 
