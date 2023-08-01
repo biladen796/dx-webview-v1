@@ -19,11 +19,11 @@ npm publish
 ## Installation
 
 ```sh
-npm install react-native-webview smaad-offerwall
+npm install react-native-webview webview-v2
 ```
 or
 ```sh
-yarn add react-native-webview smaad-offerwall
+yarn add react-native-webview webview-v2
 ```
 ## Usage
 In your App.js (or App.tsx)

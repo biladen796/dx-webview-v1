@@ -264,8 +264,6 @@ const CustomWebview = memo(
 
                 if (newUrlObj.host !== curUrlObj.host) {
                   onChangeHost(event.url);
-                  canGoBack.current = false;
-                  ref.current?.clearHistory && ref.current?.clearHistory();
                   return false;
                 }
 
@@ -309,8 +307,6 @@ const CustomWebview = memo(
 
                 if (event.nativeEvent.statusCode === 401) {
                   onAuthError(event.nativeEvent.url);
-                  ref.current?.clearHistory && ref.current?.clearHistory();
-                  canGoBack.current = false;
                 }
               }}
               source={{ uri, headers }}

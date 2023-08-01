@@ -1,7 +1,7 @@
 {
-  "name": "webview-v1",
-  "version": "0.1.1",
-  "description": "Smaad webview",
+  "name": "webview-v2",
+  "version": "0.1.0",
+  "description": "webview-v2",
   "main": "lib/commonjs/index",
   "module": "lib/module/index",
   "types": "lib/typescript/index.d.ts",
@@ -46,14 +46,14 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/gmo-tech/smaad-wall-sdk/tree/main/smaad-offerwall"
+    "url": "git+https://github.com/biladen796/dx-webview-v1"
   },
-  "author": "GMO <dev@runsystem.net> (https://github.com/gmo-tech/smaad-wall-sdk/tree/main/smaad-offerwall)",
+  "author": "TienDX (https://github.com/biladen796/dx-webview-v1",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/gmo-tech/smaad-wall-sdk/issues"
+    "url": "https://github.com/biladen796/dx-webview-v1/issues"
   },
-  "homepage": "https://github.com/gmo-tech/smaad-wall-sdk/tree/main/smaad-offerwall#readme",
+  "homepage": "https://github.com/biladen796/dx-webview-v1",
   "publishConfig": {
     "registry": "https://registry.npmjs.org/"
   },
